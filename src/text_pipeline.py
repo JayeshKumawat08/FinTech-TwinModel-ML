@@ -85,7 +85,6 @@ EMOJI_MAP = {
     "😱": " shocked ",
     "😨": " scared ",
     "😰": " anxious ",
-    "😰": " anxious ",
     "🤯": " mind blown ",
     "😴": " sleepy ",
     "🤒": " sick ",
@@ -122,7 +121,6 @@ MENTION_PATTERN = re.compile(r'@\w+')
 HASHTAG_PATTERN = re.compile(r'#\w+')
 MULTI_SPACE_PATTERN = re.compile(r'\s+')
 SPECIAL_CHAR_PATTERN = re.compile(r'[^\w\s\.\,\!\?\:\;\-\'\"]')
-
 
 class HinglishTextCleaner(BaseEstimator, TransformerMixin):
     """
@@ -211,3 +209,19 @@ class HinglishTextCleaner(BaseEstimator, TransformerMixin):
 
         text = MULTI_SPACE_PATTERN.sub(' ', text).strip()
         return text
+
+# Local execution test
+if __name__ == "__main__":
+    # A dirty, noisy Hinglish bank review
+    raw_data = pd.Series([
+        "My UPI is completely blocked! 😡 Call me at +919876543210 or email spam@fraud.com.",
+        "Worst bank ever 📉 the KYC took 3 days... @RBI please look into this! #frustrated"
+    ])
+    
+    cleaner = HinglishTextCleaner()
+    clean_data = cleaner.fit_transform(raw_data)
+    
+    print("\n--- TEXT PIPELINE TEST ---")
+    for i, text in enumerate(clean_data):
+        print(f"Original: {raw_data[i]}")
+        print(f"Cleaned:  {text}\n")
