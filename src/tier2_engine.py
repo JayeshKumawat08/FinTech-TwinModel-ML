@@ -9,7 +9,6 @@ from sklearn.metrics import classification_report
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def main() -> None:
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     data_path = os.path.join(project_root, "data", "processed", "cleaned_reviews.csv")
@@ -18,6 +17,8 @@ def main() -> None:
     df = pd.read_csv(data_path)
 
     df = df.dropna(subset=["cleaned_content"])
+    
+    # 1. Tier-2 Isolation: Drop compliments, keep only actionable complaints
     df = df[df["score"].isin([1, 2, 3])].copy()
     logging.info(f"Filtered to actionable reviews (scores 1-3): {len(df)} rows")
     logging.info(f"Score distribution:\n{df['score'].value_counts().sort_index()}")
@@ -30,6 +31,7 @@ def main() -> None:
     )
     logging.info(f"Train size: {len(X_train)}, Test size: {len(X_test)}")
 
+    # 2. Advanced Ensemble Architecture
     pipeline = Pipeline([
         ("tfidf", TfidfVectorizer(max_features=3000, ngram_range=(1, 2))),
         ("clf", RandomForestClassifier(
@@ -46,7 +48,7 @@ def main() -> None:
 
     y_pred = pipeline.predict(X_test)
 
-    logging.info("\n=== Tier-2 Classification Report (Scores 1, 2, 3) ===")
+    print("\n=== Tier-2 Classification Report (Scores 1, 2, 3) ===")
     print(classification_report(y_test, y_pred, target_names=["Score 1 (Critical)", "Score 2 (High)", "Score 3 (Medium)"]))
 
 
